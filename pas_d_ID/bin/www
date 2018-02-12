@@ -111,6 +111,9 @@ io.sockets.on('connection', function (socket) {
 	function enterNewRoomAndCheckIfExist (data) {
 		if (typeof socket.room !== "undefined") {
 			socket.leave(socket.room);
+			var lUsrs = getClientsNamesInRoom ();
+			io.sockets.in(socket.room).to(socket.room).emit('updateUsers', lUsrs);
+			socket.emit('updateRoomName', socket.room);
 		}
 		locVar = data;
 		socket.room = locVar;

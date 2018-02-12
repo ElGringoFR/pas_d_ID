@@ -57,18 +57,17 @@
     <header class="masthead">
       <div class="container h-100">
         <div class="row h-100">
-          <div class="col-lg-7 my-auto">
+          <div class="col-lg-12 my-auto">
             <div class="header-content mx-auto">
               <h1 class="mb-5">pas_d_ID, le site de chat où il fait bon venir quand t'as pas d'idées</h1>
-              <a href="#download" class="btn btn-outline btn-xl js-scroll-trigger">Go!</a>
+              <!--<a href="#download" class="btn btn-outline btn-xl js-scroll-trigger">Go!</a>-->
             </div>
           </div>
-          <div class="col-lg-5 my-auto">
-          </div>
-		  <form action="" id="newRoom">
+		  <div id="map"></div>
+		  <!--<form action="" id="newRoom">
 			<input type="text" id="message" class="text" />
 			<input type="submit" id="send" value="newRoom" class="submit" />
-		  </form>
+		  </form>-->
         </div>
       </div>
     </header>
@@ -155,10 +154,15 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?callback=initMap" async defer></script>
 
 <script>
 	var socket = io.connect('http://localhost:3000');
 	var myUserName;
+	
+	var marker;
+	var lat;
+    var lng;
 
 	socket.on('updatechat', function (username, data,h,m,color) {
 	if(myUserName === username){
@@ -260,4 +264,45 @@
 		$('#message').focus(); //pour remettre le focus
 		  });
 	});
+	
+	
+      function initMap() {
+        // Create a map object and specify the DOM element for display.
+        var map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat: 47.480496, lng: -0.592118},
+          zoom: 8
+        });
+		
+		var infowindow = new google.maps.InfoWindow({
+          content: "Cliquez pour entrer dans le channel de cette zone"
+        });
+		
+		
+
+        map.addListener('click', function(e) {
+		if(typeof marker !== "undefined"){marker.setMap(null);}
+		  
+		  marker = new google.maps.Marker({
+			position: e.latLng,
+			map: map
+		  });
+          infowindow.open(map, marker);
+
+          marker.addListener('click', function(){
+				if(typeof marker !== "undefined"){marker.setMap(null);}
+				  marker = new google.maps.Marker({
+					position: e.latLng,
+					map: map,
+					icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
+				  });
+				lat=marker.position.lat();
+				lng=marker.position.lng();
+				//console.log(lat+";"+lng);
+				infowindow.close(map, marker);
+				socket.emit('newRoom', (Math.round(lat * 500) / 500)+";"+(Math.round(lng * 500) / 500));
+          });
+
+          map.setCenter(marker.latLng);
+        });
+      }
 </script>
