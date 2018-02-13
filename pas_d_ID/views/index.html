@@ -162,7 +162,8 @@
 <script src="https://maps.googleapis.com/maps/api/js?callback=initMap" async defer></script>
 
 <script>
-	var socket = io.connect('http://localhost:3000');
+	//var socket = io.connect('http://localhost:3000');
+	var socket = io.connect('37.59.118.164:3000');
 	var myUserName;
 	var mySocketId;
 	
@@ -216,8 +217,10 @@
 	}
 	//$('#conversation').scrollTop($('#conversation')[0].scrollHeight);
 	
-	var d = $('.panel-body');
-	d.animate({ scrollTop: d.prop("scrollHeight")}, 300);
+	/*var d = $('.panel-body');
+	d.animate({ scrollTop: d.prop("scrollHeight")}, 300);*/
+	var element = document.getElementById($('.panel-body'));
+	element.scrollTop = element.scrollHeight - element.clientHeight;
 	
 	});
 	
@@ -266,7 +269,7 @@
                 });
 		infowindow.close(map, marker);
 		var d = $('#page-top');
-		window.scrollTo(0,document.body.scrollHeight);
+		//window.scrollTo(0,document.body.scrollHeight);
 	});
 	
 	// on load of page
