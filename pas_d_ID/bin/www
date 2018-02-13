@@ -49,7 +49,7 @@ io.sockets.on('connection', function (socket) {
 			var h = date.getHours();
 			var m = date.getMinutes();
 			socket.emit('updatechat', 'SERVER', 'your new pseudo is: ' + username,h,m);
-			socket.emit('hideChooseName');
+			socket.emit('hideChooseName',socket.id);
 			var color = (Math.floor(Math.random() * 256)).toString(16) + (Math.floor(Math.random() * 256)).toString(16) + (Math.floor(Math.random() * 256)).toString(16);
 			socket.color = color;
 		}else{
@@ -68,7 +68,7 @@ io.sockets.on('connection', function (socket) {
 		date.setTime(date.getTime());
 		var h = date.getHours();
 		var m = date.getMinutes();
-		io.sockets.in(socket.room).emit('updatechat', socket.username, data,h,m,socket.color);
+		io.sockets.in(socket.room).emit('updatechat', socket.username, data,h,m,socket.color,socket.id);
 	});
 	
 	socket.on('newRoom', function(data){

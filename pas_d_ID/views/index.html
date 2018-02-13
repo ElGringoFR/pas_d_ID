@@ -159,13 +159,14 @@
 <script>
 	var socket = io.connect('http://localhost:3000');
 	var myUserName;
+	var mySocketId;
 	
 	var marker;
     var rectangle;
 	var lat;
     var lng;
-	socket.on('updatechat', function (username, data,h,m,color) {
-	if(myUserName === username){
+	socket.on('updatechat', function (username, data,h,m,color,socketId) {
+	if((mySocketId === socketId) && ("SERVER" !== username)){
 		$('#conversation').append('<li class="right clearfix"><span class="chat-img pull-right">'+
                             '<img src="http://placehold.it/50/' + color + '/fff&text=ME" alt="User Avatar" class="img-circle" />'+
                         '</span>'+
@@ -231,8 +232,9 @@
 		$('#nbUsrs').append(nb);
 	});
 	
-	socket.on('hideChooseName', function() {
+	socket.on('hideChooseName', function(data) {
 		$('#chooseName').hide();
+		mySocketId = data;
 	});
 	
 	socket.on('roomCreation', function() {
