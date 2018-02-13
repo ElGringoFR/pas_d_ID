@@ -106,7 +106,7 @@
                         </ul>
                     </div>
                 </div>
-                <div class="panel-body">
+                <div id="conv" class="panel-body">
                     <ul id="conversation" class="chat">
                     </ul>
                 </div>
@@ -217,9 +217,7 @@
 	}
 	//$('#conversation').scrollTop($('#conversation')[0].scrollHeight);
 	
-	/*var d = $('.panel-body');
-	d.animate({ scrollTop: d.prop("scrollHeight")}, 300);*/
-	var element = document.getElementById($('.panel-body'));
+	var element = document.getElementById('conv');
 	element.scrollTop = element.scrollHeight - element.clientHeight;
 	
 	});
