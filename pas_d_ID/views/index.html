@@ -161,6 +161,8 @@
 	var myUserName;
 	
 	var marker;
+	var marker2;
+	var markers=[];
 	var lat;
     var lng;
 
@@ -208,7 +210,7 @@
                             '</div>'+
                         '</li>');
 	}
-	
+	//$('#conversation').scrollTop($('#conversation')[0].scrollHeight);
 	});
 	
 	socket.on('updateRoomName', function (data) {
@@ -277,10 +279,35 @@
           content: "Cliquez pour entrer dans le channel de cette zone"
         });
 		
+		//****************************
 		
+		var longpress = false;
 
-        map.addListener('click', function(e) {
-		if(typeof marker !== "undefined"){marker.setMap(null);}
+		google.maps.event.addListener(map,'click', function (event) {
+				//(longpress) ? console.log("Long Press") : console.log("Short Press");
+				if(longpress){
+					mapWork(event);
+				}
+			});
+
+
+
+		google.maps.event.addListener(map, 'mousedown', function(event){
+
+					start = new Date().getTime();           
+				});
+
+		google.maps.event.addListener(map, 'mouseup', function(event){
+
+					end = new Date().getTime();
+						longpress = (end - start < 300) ? false : true;         
+
+				});
+				
+		//************************
+
+		function mapWork(e) {
+			if(typeof marker !== "undefined"){marker.setMap(null);}
 		  
 		  marker = new google.maps.Marker({
 			position: e.latLng,
@@ -299,10 +326,54 @@
 				lng=marker.position.lng();
 				//console.log(lat+";"+lng);
 				infowindow.close(map, marker);
-				socket.emit('newRoom', (Math.round(lat * 500) / 500)+";"+(Math.round(lng * 500) / 500));
+				for(i=0;i<4;i++){if(typeof markers[i] !== "undefined"){markers[i].setMap(null);}}
+				markers=[];
+				//alert("old:"+lat+";"+lng+"new:"+parseFloat(lat.toFixed(2))+";"+parseFloat(lng.toFixed(2)));
+				for(i=0;i<4;i++){
+				var myLat = lat;var myLng = lng;
+					if(i==0){
+						markers[i] = new google.maps.Marker({
+						position: new google.maps.LatLng(Math.floor(myLat*100)/100,Math.floor(myLng*100)/100),
+						title:"a",
+						map: map,
+						icon: 'http://labs.google.com/ridefinder/images/mm_20_blue.png'
+					  });
+					}
+					if(i==1){
+						markers[i] = new google.maps.Marker({
+						position: new google.maps.LatLng((Math.floor(myLat*100)/100)+0.01,Math.floor(myLng*100)/100),
+						title:"b",
+						map: map,
+						icon: 'http://labs.google.com/ridefinder/images/mm_20_blue.png'
+					  });
+					}
+					if(i==2){
+						markers[i] = new google.maps.Marker({
+						position: new google.maps.LatLng(Math.floor(myLat*100)/100,(Math.floor(myLng*100)/100)+0.01),
+						title:"c",
+						map: map,
+						icon: 'http://labs.google.com/ridefinder/images/mm_20_blue.png'
+					  });
+					}
+					if(i==3){
+						markers[i] = new google.maps.Marker({
+						position: new google.maps.LatLng((Math.floor(myLat*100)/100)+0.01,(Math.floor(myLng*100)/100)+0.01),
+						title:"d",
+						map: map,
+						icon: 'http://labs.google.com/ridefinder/images/mm_20_blue.png'
+					  });
+					}
+				}
+				markers.forEach(function(element) {
+				  marker2 = new google.maps.Marker({
+					position: element,
+					map: map
+				  });
+				});
+				socket.emit('newRoom', Math.floor(myLat*100)/100+";"+Math.floor(myLng*100)/100);
           });
 
           map.setCenter(marker.latLng);
-        });
+		}
       }
 </script>
