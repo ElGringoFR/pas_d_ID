@@ -53,25 +53,7 @@
         </div>
       </div>
     </nav>
-
-    <header class="masthead">
-      <div class="container h-100">
-        <div class="row h-100">
-          <div class="col-lg-12 my-auto">
-            <div class="header-content mx-auto">
-              <h1 class="mb-5">pas_d_ID, le site de chat où il fait bon venir quand t'as pas d'idées</h1>
-              <!--<a href="#download" class="btn btn-outline btn-xl js-scroll-trigger">Go!</a>-->
-            </div>
-          </div>
-		  <div id="map"></div>
-		  <!--<form action="" id="newRoom">
-			<input type="text" id="message" class="text" />
-			<input type="submit" id="send" value="newRoom" class="submit" />
-		  </form>-->
-        </div>
-      </div>
-    </header>
-
+	
 	<section id="chooseName" class="cta">
       <div class="cta-content">
         <div class="container">
@@ -84,6 +66,29 @@
       </div>
       <div class="overlay"></div>
     </section>
+
+    <header class="masthead">
+      <div class="container h-100">
+        <div class="row h-100">
+          <div class="col-lg-12 my-auto">
+            <div>
+              <h1 class="mb-5" style="text-align:center">pas_d_ID</h1>
+			  <h2 class="mb-5" style="text-align:center">Le site de chat anonyme où il fait bon venir quand t'as pas d'idées.</h2>
+			  <div style="height:100px;"></div>
+			  <h3 class="mb-5" style="text-align:center">Sélectionnez la zone où vous souhaiteriez ouvrir un chat :</h3>
+              <!--<a href="#download" class="btn btn-outline btn-xl js-scroll-trigger">Go!</a>-->
+            </div>
+          </div>
+		  <div id="map"></div>
+		  <!--<form action="" id="newRoom">
+			<input type="text" id="message" class="text" />
+			<input type="submit" id="send" value="newRoom" class="submit" />
+		  </form>-->
+        </div>
+      </div>
+    </header>
+
+	
 	
     <section class="features" id="features">
       <div class="container">
@@ -260,6 +265,8 @@
                     }
                 });
 		infowindow.close(map, marker);
+		var d = $('#page-top');
+		window.scrollTo(0,document.body.scrollHeight);
 	});
 	
 	// on load of page
@@ -270,7 +277,7 @@
 			$('#data').val('');
 			$('#data').focus();
 			// tell server to execute 'sendchat' and send along one parameter
-			socket.emit('sendchat', message);
+			if(message!==""){socket.emit('sendchat', message);}
 		});
 		// when the client hits ENTER on their keyboard
 		$('#data').keypress(function(e) {
