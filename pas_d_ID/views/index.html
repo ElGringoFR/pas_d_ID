@@ -161,11 +161,9 @@
 	var myUserName;
 	
 	var marker;
-	var marker2;
-	var markers=[];
+    var rectangle;
 	var lat;
-        var lng;
-
+    var lng;
 	socket.on('updatechat', function (username, data,h,m,color) {
 	if(myUserName === username){
 		$('#conversation').append('<li class="right clearfix"><span class="chat-img pull-right">'+
@@ -242,7 +240,6 @@
 			// tell server to execute 'sendchat' and send along one parameter
 			socket.emit('sendchat', message);
 		});
-
 		// when the client hits ENTER on their keyboard
 		$('#data').keypress(function(e) {
 			if(e.which == 13) {
@@ -268,96 +265,67 @@
 	});
 	
 	
-      function initMap() {
+    function initMap() {
         // Create a map object and specify the DOM element for display.
         var map = new google.maps.Map(document.getElementById('map'), {
-          center: {lat: 47.480496, lng: -0.592118},
-          zoom: 8,
-	  gestureHandling: 'greedy'
+            center: {lat: 47.480496, lng: -0.592118},
+            zoom: 8,
+	        gestureHandling: 'greedy'
         });
 		
-	  var infowindow = new google.maps.InfoWindow({
-          content: "Cliquez pour entrer dans le channel de cette zone"
+	    var infowindow = new google.maps.InfoWindow({
+            content: "Cliquez pour entrer dans le channel de cette zone"
         });
-		
-		//****************************
-		
-
+				
 		google.maps.event.addListener(map,'click', function (event) {
-				mapWork(event);
-			});
-
-
-		//************************
+            mapWork(event);
+        });
 
 		function mapWork(e) {
-			if(typeof marker !== "undefined"){marker.setMap(null);}
+            if(typeof marker !== "undefined") { marker.setMap(null); }
 		  
-		  marker = new google.maps.Marker({
-			position: e.latLng,
-			map: map
-		  });
-        	  	infowindow.open(map, marker);
+		    marker = new google.maps.Marker({
+			    position: e.latLng,
+			    map: map
+		    });
 
-	        	  marker.addListener('click', function(){
+            infowindow.open(map, marker);
+            
+	        marker.addListener('click', function(){
 				if(typeof marker !== "undefined"){marker.setMap(null);}
-				  marker = new google.maps.Marker({
-					position: e.latLng,
-					map: map,
-					icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
-				  });
+				    marker = new google.maps.Marker({
+					    position: e.latLng,
+					    map: map,
+					    icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
+				    });
 				lat=marker.position.lat();
 				lng=marker.position.lng();
-				//console.log(lat+";"+lng);
-				infowindow.close(map, marker);
-				for(i=0;i<4;i++){if(typeof markers[i] !== "undefined"){markers[i].setMap(null);}}
-				markers=[];
-				//alert("old:"+lat+";"+lng+"new:"+parseFloat(lat.toFixed(2))+";"+parseFloat(lng.toFixed(2)));
-				for(i=0;i<4;i++){
-				var myLat = lat;var myLng = lng;
-					if(i==0){
-						markers[i] = new google.maps.Marker({
-						position: new google.maps.LatLng(Math.floor(myLat*100)/100,Math.floor(myLng*100)/100),
-						title:"a",
-						map: map,
-						icon: 'http://labs.google.com/ridefinder/images/mm_20_blue.png'
-					  });
-					}
-					if(i==1){
-						markers[i] = new google.maps.Marker({
-						position: new google.maps.LatLng((Math.floor(myLat*100)/100)+0.01,Math.floor(myLng*100)/100),
-						title:"b",
-						map: map,
-						icon: 'http://labs.google.com/ridefinder/images/mm_20_blue.png'
-					  });
-					}
-					if(i==2){
-						markers[i] = new google.maps.Marker({
-						position: new google.maps.LatLng(Math.floor(myLat*100)/100,(Math.floor(myLng*100)/100)+0.01),
-						title:"c",
-						map: map,
-						icon: 'http://labs.google.com/ridefinder/images/mm_20_blue.png'
-					  });
-					}
-					if(i==3){
-						markers[i] = new google.maps.Marker({
-						position: new google.maps.LatLng((Math.floor(myLat*100)/100)+0.01,(Math.floor(myLng*100)/100)+0.01),
-						title:"d",
-						map: map,
-						icon: 'http://labs.google.com/ridefinder/images/mm_20_blue.png'
-					  });
-					}
-				}
-				markers.forEach(function(element) {
-				  marker2 = new google.maps.Marker({
-					position: element,
-					map: map
-				  });
-				});
-				socket.emit('newRoom', Math.floor(myLat*100)/100+";"+Math.floor(myLng*100)/100);
-          });
 
-          map.setCenter(marker.latLng);
+				infowindow.close(map, marker);
+				
+				var myLat = Math.floor(lat*100)/100;
+                var myLng = Math.floor(lng*100)/100;
+
+                if(typeof rectangle !== "undefined") { rectangle.setMap(null); }
+				rectangle = new google.maps.Rectangle({
+                    strokeColor: '#00FF00',
+                    strokeOpacity: 0.8,
+                    strokeWeight: 2,
+                    fillColor: '#00FF00',
+                    fillOpacity: 0.35,
+                    map: map,
+                    bounds: {
+                        north: myLat + 0.01,
+                        south: myLat,
+                        east: myLng+0.01,
+                        west: myLng
+                    }
+                });
+				
+				socket.emit('newRoom', myLat+";"+myLng);
+            });
+            map.setCenter(marker.latLng);
 		}
-      }
-</script>
+    }
+
+</script> 
