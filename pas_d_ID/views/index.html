@@ -157,7 +157,7 @@
 <script src="https://maps.googleapis.com/maps/api/js?callback=initMap" async defer></script>
 
 <script>
-	var socket = io.connect('37.59.118.164:3000');
+	var socket = io.connect('http://localhost:3000');
 	var myUserName;
 	
 	var marker;
@@ -235,6 +235,31 @@
 		$('#chooseName').hide();
 	});
 	
+	socket.on('roomCreation', function() {
+		if(typeof marker !== "undefined"){marker.setMap(null);}
+				    marker = new google.maps.Marker({
+					    position: new google.maps.LatLng(lat, lng),
+					    map: map,
+					    icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
+		});
+		if(typeof rectangle !== "undefined") { rectangle.setMap(null); }
+				rectangle = new google.maps.Rectangle({
+                    strokeColor: '#00FF00',
+                    strokeOpacity: 0.8,
+                    strokeWeight: 2,
+                    fillColor: '#00FF00',
+                    fillOpacity: 0.35,
+                    map: map,
+                    bounds: {
+                        north: Math.floor(lat*100)/100 + 0.01,
+                        south: Math.floor(lat*100)/100,
+                        east: Math.floor(lng*100)/100+0.01,
+                        west: Math.floor(lng*100)/100
+                    }
+                });
+		infowindow.close(map, marker);
+	});
+	
 	// on load of page
 	$(function(){
 		// when the client clicks SEND
@@ -268,17 +293,18 @@
 		$('#message').focus(); //pour remettre le focus
 		  });
 	});
-	
-	
+	var map;
+	var marker;
+	var infowindow;
     function initMap() {
         // Create a map object and specify the DOM element for display.
-        var map = new google.maps.Map(document.getElementById('map'), {
+        map = new google.maps.Map(document.getElementById('map'), {
             center: {lat: 47.480496, lng: -0.592118},
             zoom: 8,
 	        gestureHandling: 'greedy'
         });
 		
-	    var infowindow = new google.maps.InfoWindow({
+	    infowindow = new google.maps.InfoWindow({
             content: "Cliquez pour entrer dans le channel de cette zone"
         });
 				
@@ -297,37 +323,9 @@
             infowindow.open(map, marker);
             
 	        marker.addListener('click', function(){
-				if(typeof marker !== "undefined"){marker.setMap(null);}
-				    marker = new google.maps.Marker({
-					    position: e.latLng,
-					    map: map,
-					    icon: 'http://maps.google.com/mapfiles/ms/icons/green-dot.png'
-				    });
 				lat=marker.position.lat();
 				lng=marker.position.lng();
-
-				infowindow.close(map, marker);
-				
-				var myLat = Math.floor(lat*100)/100;
-                var myLng = Math.floor(lng*100)/100;
-
-                if(typeof rectangle !== "undefined") { rectangle.setMap(null); }
-				rectangle = new google.maps.Rectangle({
-                    strokeColor: '#00FF00',
-                    strokeOpacity: 0.8,
-                    strokeWeight: 2,
-                    fillColor: '#00FF00',
-                    fillOpacity: 0.35,
-                    map: map,
-                    bounds: {
-                        north: myLat + 0.01,
-                        south: myLat,
-                        east: myLng+0.01,
-                        west: myLng
-                    }
-                });
-				
-				socket.emit('newRoom', myLat+";"+myLng);
+				socket.emit('newRoom', Math.floor(lat*100)/100+";"+Math.floor(lng*100)/100);
             });
             map.setCenter(marker.latLng);
 		}

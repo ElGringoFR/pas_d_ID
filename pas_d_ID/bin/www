@@ -74,6 +74,7 @@ io.sockets.on('connection', function (socket) {
 	socket.on('newRoom', function(data){
 		if(typeof socket.username !== "undefined"){
 			enterNewRoomAndCheckIfExist(data);
+			socket.emit('roomCreation');
 		}else{
 			var date = new Date;
 			date.setTime(date.getTime());
