@@ -339,6 +339,11 @@
             });
             map.setCenter(marker.latLng);
 		}
+		
+		google.maps.event.addListener(map, 'mousedown', function () {
+			$('#data').blur();
+		});
+		
     }
 
 </script> 
