@@ -48,7 +48,7 @@ io.sockets.on('connection', function (socket) {
 			date.setTime(date.getTime());
 			var h = date.getHours();
 			var m = date.getMinutes();
-			socket.emit('updatechat', 'SERVER', 'your new pseudo is tralala: ' + username,h,m);
+			socket.emit('updatechat', 'SERVER', 'your new pseudo is: ' + username,h,m);
 			socket.emit('hideChooseName',socket.id);
 			var color = (Math.floor(Math.random() * 256)).toString(16) + (Math.floor(Math.random() * 256)).toString(16) + (Math.floor(Math.random() * 256)).toString(16);
 			socket.color = color;
@@ -72,7 +72,20 @@ io.sockets.on('connection', function (socket) {
 		io.sockets.in(socket.room).emit('updatechat', socket.username, data,h,m,socket.color,socket.id);
 	});
 	
-	socket.on('newRoom', function(data){
+	function throttle (func, delay) {
+		var prev = 0
+		
+		return function () {
+			var next = Date.now()
+			
+			if (next - prev > delay) {
+				prev = next
+				return func.apply(this, arguments)
+			}
+		}
+	}
+	
+	socket.on('newRoom', throttle(function(data){
 		data = escapeHTML(data);
 		if(typeof socket.username !== "undefined"){
 			enterNewRoomAndCheckIfExist(data);
@@ -84,7 +97,7 @@ io.sockets.on('connection', function (socket) {
 			var m = date.getMinutes();
 			socket.emit('updatechat', 'SERVER', 'create a pseudo before',h,m);
 		}
-	});
+	}, 1000));
 
 	// when the user disconnects.. perform this
 	socket.on('disconnect', function(){
