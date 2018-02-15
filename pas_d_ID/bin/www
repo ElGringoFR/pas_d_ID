@@ -38,9 +38,9 @@ var usernames = {};
 var rooms = [];
 
 io.sockets.on('connection', function (socket) {
-	
 	// when the client emits 'adduser', this listens and executes
 	socket.on('adduser', function(username){
+		username = escapeHTML(username);
 		if(typeof socket.username === "undefined"){
 			socket.username = username;
 			usernames[username] = username;
@@ -48,7 +48,7 @@ io.sockets.on('connection', function (socket) {
 			date.setTime(date.getTime());
 			var h = date.getHours();
 			var m = date.getMinutes();
-			socket.emit('updatechat', 'SERVER', 'your new pseudo is: ' + username,h,m);
+			socket.emit('updatechat', 'SERVER', 'your new pseudo is tralala: ' + username,h,m);
 			socket.emit('hideChooseName',socket.id);
 			var color = (Math.floor(Math.random() * 256)).toString(16) + (Math.floor(Math.random() * 256)).toString(16) + (Math.floor(Math.random() * 256)).toString(16);
 			socket.color = color;
@@ -63,6 +63,7 @@ io.sockets.on('connection', function (socket) {
 	
 	// when the client emits 'sendchat', this listens and executes
 	socket.on('sendchat', function (data) {
+		data = escapeHTML(data);
 		// we tell the client to execute 'updatechat' with 2 parameters
 		var date = new Date;
 		date.setTime(date.getTime());
@@ -72,6 +73,7 @@ io.sockets.on('connection', function (socket) {
 	});
 	
 	socket.on('newRoom', function(data){
+		data = escapeHTML(data);
 		if(typeof socket.username !== "undefined"){
 			enterNewRoomAndCheckIfExist(data);
 			socket.emit('roomCreation');
@@ -110,6 +112,7 @@ io.sockets.on('connection', function (socket) {
 	}
 
 	function enterNewRoomAndCheckIfExist (data) {
+		data = escapeHTML(data);
 		if (typeof socket.room !== "undefined") {
 			socket.leave(socket.room);
 			var lUsrs = getClientsNamesInRoom ();
@@ -141,6 +144,19 @@ io.sockets.on('connection', function (socket) {
 		}
 		return usrNames;
 	}
+	
+	function escapeHTML(message) {
+ 
+	  var map = {
+		'&': '&amp;',
+		'<': '&lt;',
+		'>': '&gt;',
+		'"': '&quot;',
+		"'": '&#39;'
+	  }
+	  return message.replace(/[&<>"']/g, chr => map[chr])
+	}
+
 	
 });
 
