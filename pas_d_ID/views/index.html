@@ -41,13 +41,13 @@
         <div class="collapse navbar-collapse" id="navbarResponsive">
           <ul class="navbar-nav ml-auto">
             <li class="nav-item">
-              <a class="nav-link js-scroll-trigger" href="#download">Download</a>
+              <a class="nav-link js-scroll-trigger" href="#download">Qui sommes-nous?</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link js-scroll-trigger" href="#features">Features</a>
+              <a class="nav-link js-scroll-trigger" href="#features">Pourquoi ce site?</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link js-scroll-trigger" href="#contact">Contact</a>
+              <a class="nav-link js-scroll-trigger" href="#contact">Contactez-nous! ;)</a>
             </li>
           </ul>
         </div>
@@ -98,7 +98,7 @@
             <div class="panel panel-primary">
                 <div class="panel-heading">
                     <span class="glyphicon glyphicon-comment"></span><p id="roomName"> Chat Unknown</p>
-                    <div class="btn-group pull-right">
+                    <div class="btn-group">
                         <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
                             <span id="nbUsrs" class="glyphicon glyphicon-chevron-down">0</span>
                         </button>
@@ -128,7 +128,7 @@
 
     <footer>
       <div class="container">
-        <p>&copy; Your Website 2018. All Rights Reserved.</p>
+        <p>&copy; pas_d_ID 2018. Created by Nicolas CHEVAL--PEYRE, Ali Bekkouch, Rémi BoisseauAll Rights Reserved.</p>
         <ul class="list-inline">
           <li class="list-inline-item">
             <a href="#">Privacy</a>
@@ -242,7 +242,7 @@
 	
 	socket.on('updateRoomName', function (data) {
 		$('#roomName').empty();
-		$('#roomName').append("Channel name : "+data);
+		$('#roomName').append("Channel : "+data + "  |  UserName : " + myUserName);
 	});
 	
 	socket.on('updateUsers', function(usrs) {
