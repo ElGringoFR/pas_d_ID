@@ -108,3 +108,8 @@ section h2{font-size:50px}#mainNav{border-color:rgba(34,34,34,.05);background-co
     margin-right:30px;
     margin-left:30px;
 }
+
+.validated
+{
+	color:#4bf442;
+}

@@ -243,6 +243,7 @@
 	socket.on('updateRoomName', function (data) {
 		$('#roomName').empty();
 		$('#roomName').append("Channel : "+data + "  |  UserName : " + myUserName);
+		$('#roomName').addClass('validated');
 	});
 	
 	socket.on('updateUsers', function(usrs) {
@@ -285,7 +286,7 @@
                 });
 		infowindow.close(map, marker);
 		var d = $('#page-top');
-		//window.scrollTo(0,document.body.scrollHeight);
+		window.scrollTo(0,document.body.scrollHeight);
 	});
 	
 	// on load of page
@@ -329,12 +330,16 @@
         map = new google.maps.Map(document.getElementById('map'), {
             center: {lat: 47.480496, lng: -0.592118},
             zoom: 8,
+			  zoomControl: true,
+			  mapTypeControl: false,
+			  scaleControl: false,
+			  streetViewControl: false,
+			  rotateControl: false,
+			  fullscreenControl: true,
 	        gestureHandling: 'greedy'
         });
 		
-	    infowindow = new google.maps.InfoWindow({
-            content: "Cliquez pour entrer dans le channel de cette zone"
-        });
+	    
 				
 		google.maps.event.addListener(map,'click', function (event) {
             mapWork(event);
@@ -347,6 +352,10 @@
 			    position: e.latLng,
 			    map: map
 		    });
+			
+			infowindow = new google.maps.InfoWindow({
+            content: "Cliquez pour entrer dans le channel "+Math.floor(lat*100)/100+";"+Math.floor(lng*100)/100
+			});
 
             infowindow.open(map, marker);
             
