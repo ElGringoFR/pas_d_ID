@@ -107,6 +107,7 @@ section h2{font-size:50px}#mainNav{border-color:rgba(34,34,34,.05);background-co
     width:100%;
     margin-right:30px;
     margin-left:30px;
+	border-radius: 5%;
 }
 
 .validated
