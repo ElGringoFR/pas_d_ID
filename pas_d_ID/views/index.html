@@ -75,7 +75,7 @@
               <h1 class="mb-5" style="text-align:center">pas_d_ID</h1>
 			  <h2 class="mb-5" style="text-align:center">Le site de chat anonyme où il fait bon venir quand t'as pas d'idées.</h2>
 			  <div style="height:100px;"></div>
-			  <h3 class="mb-5" style="text-align:center">Sélectionnez la zone où vous souhaiteriez ouvrir un chat :</h3>
+			  <h3 class="mb-5" style="text-align:center">Selectionnez la zone où vous souhaiteriez ouvrir un chat :</h3>
               <!--<a href="#download" class="btn btn-outline btn-xl js-scroll-trigger">Go!</a>-->
             </div>
           </div>
@@ -159,12 +159,12 @@
 
 <script src="/socket.io/socket.io.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
-<script src="https://maps.googleapis.com/maps/api/js?callback=initMap" async defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAS6dFQwxYPH97h8hqEuYLketM-AIIj7N4&callback=initMap" async defer></script>
 <script src="/push.js/bin/push.min.js"></script>
 
 <script>
-	var socket = io.connect('http://localhost:3000');
-	//var socket = io.connect('37.59.118.164:3000');
+	//var socket = io.connect('http://localhost:3000');
+	var socket = io.connect('drab1g.ovh:8443');
 	var myUserName;
 	var mySocketId;
 	
