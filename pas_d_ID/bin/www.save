@@ -1,0 +1,249 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var app = require('../app');
+var debug = require('debug')('pas-d-id:server');
+var https = require('https');
+var fs = require('fs');
+
+var options = {
+  key: fs.readFileSync('./public/file.pem'),
+  cert: fs.readFileSync('./')
+};
+
+/**
+ * Get port from environment and store in Express.
+ */
+
+var port = normalizePort(process.env.PORT || '8443');
+app.set('port', port);
+
+/**
+ * Create HTTP server.
+ */
+
+var server = https.createServer(options,app);
+
+var io = require('socket.io').listen(server);
+
+// Nouvelle fonction permettant de supprimer un élément dans un tableau
+Array.prototype.unset = function(val){
+var index = this.indexOf(val)
+  if(index > -1){
+    this.splice(index,1)
+  }
+}
+
+// usernames which are currently connected to the chat
+var usernames = {};
+
+// rooms which are currently available in chat
+var rooms = [];
+
+io.sockets.on('connection', function (socket) {
+	// when the client emits 'adduser', this listens and executes
+	socket.on('adduser', function(username){
+		username = escapeHTML(username);
+		if(typeof socket.username === "undefined"){
+			socket.username = username;
+			usernames[username] = username;
+			var date = new Date;
+			date.setTime(date.getTime());
+			var h = date.getHours();
+			var m = date.getMinutes();
+			socket.emit('updatechat', 'SERVER', 'your new pseudo is: ' + username,h,m);
+			socket.emit('hideChooseName',socket.id);
+			var color = (Math.floor(Math.random() * 256)).toString(16) + (Math.floor(Math.random() * 256)).toString(16) + (Math.floor(Math.random() * 256)).toString(16);
+			socket.color = color;
+		}else{
+			var date = new Date;
+			date.setTime(date.getTime());
+			var h = date.getHours();
+			var m = date.getMinutes();
+			socket.emit('updatechat', 'SERVER', 'you cant change of pseudo so please disconnect and reco to change ' + username,h,m);
+		}
+	});
+	
+	// when the client emits 'sendchat', this listens and executes
+	socket.on('sendchat', function (data) {
+		data = escapeHTML(data);
+		// we tell the client to execute 'updatechat' with 2 parameters
+		var date = new Date;
+		date.setTime(date.getTime());
+		var h = date.getHours();
+		var m = date.getMinutes();
+		io.sockets.in(socket.room).emit('updatechat', socket.username, data,h,m,socket.color,socket.id);
+	});
+	
+	function throttle (func, delay) {
+		var prev = 0
+		
+		return function () {
+			var next = Date.now()
+			
+			if (next - prev > delay) {
+				prev = next
+				return func.apply(this, arguments)
+			}
+		}
+	}
+	
+	socket.on('newRoom', throttle(function(data){
+		data = escapeHTML(data);
+		if(typeof socket.username !== "undefined"){
+			enterNewRoomAndCheckIfExist(data);
+			socket.emit('roomCreation');
+		}else{
+			var date = new Date;
+			date.setTime(date.getTime());
+			var h = date.getHours();
+			var m = date.getMinutes();
+			socket.emit('updatechat', 'SERVER', 'create a pseudo before',h,m);
+		}
+	}, 1000));
+
+	// when the user disconnects.. perform this
+	socket.on('disconnect', function(){
+		// remove the username from global usernames list
+		delete usernames[socket.username];
+		// update list of users in chat, client-side
+		io.sockets.emit('updateusers', usernames);
+		var room = io.sockets.adapter.rooms[socket.room];
+		if (typeof room === "undefined") {
+			rooms.forEach(function(element) {
+			  if(element.localeCompare(socket.room) == 0){
+				  remove(rooms,element);
+			  }
+			});
+		}
+		var lUsrs = getClientsNamesInRoom ();
+		io.sockets.in(socket.room).to(socket.room).emit('updateUsers', lUsrs);
+		socket.leave(socket.room);
+		
+	});
+	
+	function remove (array, item) {
+		var i = array.indexOf(item)
+		if (i > -1) array.splice(i, 1)
+	}
+
+	function enterNewRoomAndCheckIfExist (data) {
+		data = escapeHTML(data);
+		if (typeof socket.room !== "undefined") {
+			socket.leave(socket.room);
+			var lUsrs = getClientsNamesInRoom ();
+			io.sockets.in(socket.room).to(socket.room).emit('updateUsers', lUsrs);
+			socket.emit('updateRoomName', socket.room);
+		}
+		locVar = data;
+		socket.room = locVar;
+		socket.join(locVar);
+		mybool = false;
+		rooms.forEach(function(element) {
+		  if(element.localeCompare(locVar) == 0){
+			  mybool = true;
+		  }
+		});
+		if(!mybool){rooms.push(locVar);}
+		var lUsrs = getClientsNamesInRoom ();
+		io.sockets.in(socket.room).to(socket.room).emit('updateUsers', lUsrs);
+		socket.emit('updateRoomName', socket.room);
+	}
+	
+	function getClientsNamesInRoom () {
+		var usrNames = [];
+		var sioRoom = io.sockets.adapter.rooms[socket.room];
+		if( sioRoom ) { 
+		  Object.keys(sioRoom.sockets).forEach( function(socketId){
+			usrNames.push(io.sockets.sockets[socketId].username);
+		  }); 
+		}
+		return usrNames;
+	}
+	
+	function escapeHTML(message) {
+ 
+	  var map = {
+		'&': '&amp;',
+		'<': '&lt;',
+		'>': '&gt;',
+		'"': '&quot;',
+		"'": '&#39;'
+	  }
+	  return message.replace(/[&<>"']/g, chr => map[chr])
+	}
+
+	
+});
+
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
+
+/**
+ * Normalize a port into a number, string, or false.
+ */
+
+function normalizePort(val) {
+  var port = parseInt(val, 10);
+
+  if (isNaN(port)) {
+    // named pipe
+    return val;
+  }
+
+  if (port >= 0) {
+    // port number
+    return port;
+  }
+
+  return false;
+}
+
+/**
+ * Event listener for HTTP server "error" event.
+ */
+
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  var bind = typeof port === 'string'
+    ? 'Pipe ' + port
+    : 'Port ' + port;
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+    case 'EACCES':
+      console.error(bind + ' requires elevated privileges');
+      process.exit(1);
+      break;
+    case 'EADDRINUSE':
+      console.error(bind + ' is already in use');
+      process.exit(1);
+      break;
+    default:
+      throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ */
+
+function onListening() {
+  var addr = server.address();
+  var bind = typeof addr === 'string'
+    ? 'pipe ' + addr
+    : 'port ' + addr.port;
+  debug('Listening on ' + bind);
+}

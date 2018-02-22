@@ -354,7 +354,7 @@
 		    });
 			
 			infowindow = new google.maps.InfoWindow({
-            content: "Cliquez pour entrer dans le channel "+Math.floor(lat*100)/100+";"+Math.floor(lng*100)/100
+            content: "Cliquez pour entrer dans le channel "+Math.floor(marker.position.lat()*100)/100+";"+Math.floor(marker.position.lng()*100)/100
 			});
 
             infowindow.open(map, marker);
