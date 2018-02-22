@@ -10,8 +10,8 @@ var https = require('https');
 var fs = require('fs');
 
 var options = {
-  key: fs.readFileSync('./public/file.pem'),
-  cert: fs.readFileSync('./public/file.crt')
+  key: fs.readFileSync('/etc/letsencrypt/live/drab1g.ovh/privkey.pem'),
+  cert: fs.readFileSync('/etc/letsencrypt/live/drab1g.ovh/fullchain.pem')
 };
 
 /**
